@@ -25,7 +25,7 @@ class AvtomobilDetailView(APIView):
         try:
             avtomobil = Avtomobil.objects.get(id=id)
         except Avtomobil.DoesNotExist:
-            NotFound("Avtomobil topilmadi")
+            raise NotFound("Avtomobil topilmadi")
         serializer = AvtomobilSerializer(avtomobil)
         return Response(serializer.data)
 
@@ -33,16 +33,16 @@ class AvtomobilDetailView(APIView):
         try:
             avtomobil = Avtomobil.objects.get(id=id)
         except Avtomobil.DoesNotExist:
-            NotFound("Avtomobil topilmadi")
-        serializer = AvtomobilSerializer(isinstance=avtomobil, data=request.data)
+            raise NotFound("Avtomobil topilmadi")
+        serializer = AvtomobilSerializer(instance=avtomobil, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.save())
+        return Response(serializer.data)
 
     def delete(self, request, id):
         try:
             avtomobil = Avtomobil.objects.get(id=id)
         except Avtomobil.DoesNotExist:
-            NotFound("Avtomobil topilmadi")
+            raise NotFound("Avtomobil topilmadi")
         avtomobil.delete()
         return Response(status=204)
