@@ -16,23 +16,25 @@ class AvtomobilSerializer(serializers.Serializer):
     izohi = serializers.CharField(write_only=True, required=False, allow_blank=True)
     yaratilgan_vaqti = serializers.DateTimeField(read_only=True)
 
-    def validate_model(self, model: str):
+    def validate_modeli(self, modeli: str):
         sozlar = ["test", "semo", "sample"]
         for soz in sozlar:
-            if model.lower().startswith(soz):
+            if modeli.lower().startswith(soz):
                 raise serializers.ValidationError(
                     "Avtomobil modeli Test, Demo yoki Sample bilan boshlanishi mumkin emas."
                 )
-        return model
+        return modeli
 
     def validate_markasi(self, markasi: str):
         markalar = ["chevrolet", "kia", "hyundai", "toyota", "bmw"]
         if markasi not in markalar:
             raise serializers.ValidationError(f"Faqat {markalar} bolishi kerak.")
+        return markasi
 
     def validate_narxi(self, narxi):
         if str(narxi).split(".")[0].endswith("999"):
             raise serializers.ValidationError("Narxi 999 bilan tugamasligi kerak.")
+        return narxi
 
     def validate(self, data: dict):
         ishlab_chiqarilgan_yili = data.get("ishlab_chiqarilgan_yili")
@@ -66,17 +68,24 @@ class AvtomobilSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "Markasi BMW bo'lsa narxi kamida 30 000 bo'lishi kerak"
             )
+        return data
 
     def create(self, validated_data):
-        return Avtomobil.create(**validated_data)
+        return Avtomobil.objects.create(**validated_data)
 
     def update(self, instance, validated_data: dict):
-        instance.model = validated_data.get("age", instance.age)
+        instance.modeli = validated_data.get("modeli", instance.modeli)
         instance.markasi = validated_data.get("markasi", instance.markasi)
         instance.narxi = validated_data.get("narxi", instance.narxi)
-        instance.ishlab_chiqarilgan_yili = validated_data.get("ishlab_chiqarilgan_yili", instance.ishlab_chiqarilgan_yili)
-        instance.yurgan_masofasi = validated_data.get("yurgan_masofasi", instance.yurgan_masofasi)
-        instance.yoqilgi_turi = validated_data.get("yoqilgi_turi", instance.yoqilgi_turi)
+        instance.ishlab_chiqarilgan_yili = validated_data.get(
+            "ishlab_chiqarilgan_yili", instance.ishlab_chiqarilgan_yili
+        )
+        instance.yurgan_masofasi = validated_data.get(
+            "yurgan_masofasi", instance.yurgan_masofasi
+        )
+        instance.yoqilgi_turi = validated_data.get(
+            "yoqilgi_turi", instance.yoqilgi_turi
+        )
         instance.izohi = validated_data.get("izohi", instance.izohi)
 
         instance.save()

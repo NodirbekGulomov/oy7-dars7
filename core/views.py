@@ -34,7 +34,7 @@ class AvtomobilDetailView(APIView):
             avtomobil = Avtomobil.objects.get(id=id)
         except Avtomobil.DoesNotExist:
             NotFound("Avtomobil topilmadi")
-        serializer = AvtomobilSerializer(data=request.data)
+        serializer = AvtomobilSerializer(isinstance=avtomobil, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.save())
