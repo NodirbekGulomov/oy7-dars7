@@ -1,4 +1,4 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from rest_framework.views import APIView, Response
 from rest_framework.exceptions import NotFound
 
@@ -16,9 +16,8 @@ class AvtomobilListCreateView(APIView):
     def post(self, request):
         serializer = AvtomobilSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        avtomobil = Avtomobil.objects.create(**serializer.validated_data)
-        s = AvtomobilSerializer(avtomobil)
-        return Response(s.data, status=201)
+        serializer.save()
+        return Response(serializer.data, status=201)
 
 
 class AvtomobilDetailView(APIView):
@@ -37,16 +36,8 @@ class AvtomobilDetailView(APIView):
             NotFound("Avtomobil topilmadi")
         serializer = AvtomobilSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        avtomobil.modeli = serializer.validated_data["modeli"]
-        avtomobil.markasi = serializer.validated_data["markasi"]
-        avtomobil.narxi = serializer.validated_data["narxi"]
-        avtomobil.ishlab_chiqarilgan_yili = serializer.validated_data["ishlab_chiqarilgan_yili"]
-        avtomobil.yurgan_masofasi = serializer.validated_data["yurgan_masofasi"]
-        avtomobil.yoqilgi_turi = serializer.validated_data["yoqilgi_turi"]
-        avtomobil.izohi = serializer.validated_data["izohi"]
-        avtomobil.save()
-        s = AvtomobilSerializer(avtomobil)
-        return Response(s.data)
+        serializer.save()
+        return Response(serializer.save())
 
     def delete(self, request, id):
         try:
