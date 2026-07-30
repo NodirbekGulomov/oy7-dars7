@@ -3,18 +3,22 @@ from rest_framework.views import APIView, Response
 from rest_framework.exceptions import NotFound
 
 from core.models import Avtomobil
-from core.serializer import AvtomobilSerializer
+from core.serializer import (
+    AvtomobilCreateSerializer,
+    AvtomobilListSerializer,
+    AvtomobilSerializer,
+)
 
 
 # Create your views here.
 class AvtomobilListCreateView(APIView):
     def get(self, request):
         avtomobillar = Avtomobil.objects.all()
-        serializer = AvtomobilSerializer(avtomobillar, many=True)
+        serializer = AvtomobilListSerializer(avtomobillar, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = AvtomobilSerializer(data=request.data)
+        serializer = AvtomobilCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=201)

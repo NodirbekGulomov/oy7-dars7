@@ -3,18 +3,25 @@ from rest_framework import serializers
 from core.models import Avtomobil
 
 
-class AvtomobilSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    modeli = serializers.CharField(min_length=2, max_length=50)
-    markasi = serializers.CharField(max_length=30)
-    narxi = serializers.DecimalField(
-        max_digits=20, decimal_places=2, min_value=1000, max_value=1000000
-    )
-    ishlab_chiqarilgan_yili = serializers.IntegerField(min_value=1990, max_value=2026)
-    yurgan_masofasi = serializers.IntegerField(min_value=0, max_value=1000000)
-    yoqilgi_turi = serializers.CharField(max_length=20)
-    izohi = serializers.CharField(write_only=True, required=False, allow_blank=True)
-    yaratilgan_vaqti = serializers.DateTimeField(read_only=True)
+class AvtomobilSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Avtomobil
+        fields = [
+            "id",
+            "modeli",
+            "markasi",
+            "narxi",
+            "ishlab_chiqarilgan_yili",
+            "yurgan_masofasi",
+            "yoqilgi_turi",
+            "izohi",
+            "yaratilgan_vaqti",
+        ]
+
+        read_only_fields = [
+            "id",
+            "yaratilgan_vaqti",
+        ]
 
     def validate_modeli(self, modeli: str):
         sozlar = ["test", "semo", "sample"]
@@ -70,23 +77,14 @@ class AvtomobilSerializer(serializers.Serializer):
             )
         return data
 
-    def create(self, validated_data):
-        return Avtomobil.objects.create(**validated_data)
 
-    def update(self, instance, validated_data: dict):
-        instance.modeli = validated_data.get("modeli", instance.modeli)
-        instance.markasi = validated_data.get("markasi", instance.markasi)
-        instance.narxi = validated_data.get("narxi", instance.narxi)
-        instance.ishlab_chiqarilgan_yili = validated_data.get(
-            "ishlab_chiqarilgan_yili", instance.ishlab_chiqarilgan_yili
-        )
-        instance.yurgan_masofasi = validated_data.get(
-            "yurgan_masofasi", instance.yurgan_masofasi
-        )
-        instance.yoqilgi_turi = validated_data.get(
-            "yoqilgi_turi", instance.yoqilgi_turi
-        )
-        instance.izohi = validated_data.get("izohi", instance.izohi)
+class AvtomobilListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Avtomobil
+        fields = ["id", "modeli", "markasi", "narxi"]
 
-        instance.save()
-        return instance
+
+class AvtomobilCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Avtomobil
+        exclude = ["id", "izohi", "yaratilgan_vaqti"]
