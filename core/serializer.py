@@ -4,6 +4,9 @@ from core.models import Avtomobil
 
 
 class AvtomobilSerializer(serializers.ModelSerializer):
+    help_text = "Mashina modelini kiriting.\n" "Misol:\n" "BMW\n"
+    modeli = serializers.CharField(min_length=2, max_length=50, help_text=help_text)
+
     class Meta:
         model = Avtomobil
         fields = [
@@ -22,6 +25,12 @@ class AvtomobilSerializer(serializers.ModelSerializer):
             "id",
             "yaratilgan_vaqti",
         ]
+
+        extra_kwargs = {
+            "izohi": {
+                "write_only": True,
+            },
+        }
 
     def validate_modeli(self, modeli: str):
         sozlar = ["test", "semo", "sample"]
