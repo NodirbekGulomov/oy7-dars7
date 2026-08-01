@@ -1,7 +1,17 @@
 from django.db import models
 
-
 # Create your models here.
+
+
+class IshlabChiqaruvchi(models.Model):
+    nomi = models.CharField(max_length=50)
+    davlat = models.CharField(max_length=50)
+    email = models.EmailField()
+
+    def __str__(self):
+        return self.nomi
+
+
 class Avtomobil(models.Model):
     modeli = models.CharField(max_length=50)
     markasi = models.CharField(max_length=30)
@@ -11,6 +21,13 @@ class Avtomobil(models.Model):
     yoqilgi_turi = models.CharField(max_length=20)
     izohi = models.TextField(blank=True)
     yaratilgan_vaqti = models.DateTimeField(auto_now_add=True)
+    ishlab_chiqaruvchi = models.ForeignKey(
+        IshlabChiqaruvchi,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="avtomobillar",
+    )
 
     def __str__(self):
         return self.modeli

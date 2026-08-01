@@ -1,11 +1,20 @@
+from datetime import datetime
+
 from rest_framework import serializers
 
-from core.models import Avtomobil
+from core.models import Avtomobil, IshlabChiqaruvchi
 
 
 class AvtomobilSerializer(serializers.ModelSerializer):
     help_text = "Mashina modelini kiriting.\n" "Misol:\n" "BMW\n"
     modeli = serializers.CharField(min_length=2, max_length=50, help_text=help_text)
+    yoshi = serializers.SerializerMethodField()
+    ishlab_chiqaruvchi_id = serializers.PrimaryKeyRelatedField(
+        queryset=IshlabChiqaruvchi.objects.all(), sourse="ishlabchiqaruvchi"
+    )
+    ishlab_chiqaruvchi_nomi = serializers.CharField(
+        source="ishlab_chiqaruvchi.nomi", read_only=True
+    )
 
     class Meta:
         model = Avtomobil
@@ -19,6 +28,8 @@ class AvtomobilSerializer(serializers.ModelSerializer):
             "yoqilgi_turi",
             "izohi",
             "yaratilgan_vaqti",
+            "yoshi",
+            "ishlab_chiqaruvchi_id",
         ]
 
         read_only_fields = [
@@ -31,6 +42,10 @@ class AvtomobilSerializer(serializers.ModelSerializer):
                 "write_only": True,
             },
         }
+
+    def get_yoshi(self, obj):
+        joriy_yil = datetime.now().year
+        return joriy_yil - obj.yoshi
 
     def validate_modeli(self, modeli: str):
         sozlar = ["test", "semo", "sample"]
@@ -86,6 +101,14 @@ class AvtomobilSerializer(serializers.ModelSerializer):
             )
         return data
 
+    def create(self, validated_data):
+        validated_data["marka"] = str(validated_data["marka"]).title()
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data: dict):
+        validated_data["marka"] = str(validated_data["marka"]).title()
+        return super().update(validated_data)
+
 
 class AvtomobilListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -97,3 +120,12 @@ class AvtomobilCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avtomobil
         exclude = ["id", "izohi", "yaratilgan_vaqti"]
+
+    def create(self, validated_data):
+        validated_data["modeli"] = str(validated_data["modeli"]).title()
+        validated_data["markasi"] = str(validated_data["markasi"]).title()
+        return super().create(validated_data)
+
+
+class IshlabChiqaruvchiSerializer(serializers.ModelSerializer):
+    pass
