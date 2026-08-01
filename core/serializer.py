@@ -5,10 +5,16 @@ from rest_framework import serializers
 from core.models import Avtomobil, IshlabChiqaruvchi
 
 
+class IshlabChiqaruvchiSerializer(serializers.ModelSerializer):
+    model = IshlabChiqaruvchi
+    fields = "__all__"
+
+
 class AvtomobilSerializer(serializers.ModelSerializer):
     help_text = "Mashina modelini kiriting.\n" "Misol:\n" "BMW\n"
     modeli = serializers.CharField(min_length=2, max_length=50, help_text=help_text)
     yoshi = serializers.SerializerMethodField()
+    ishlab_chiqaruvchi = IshlabChiqaruvchiSerializer(read_only=True)
     ishlab_chiqaruvchi_id = serializers.PrimaryKeyRelatedField(
         queryset=IshlabChiqaruvchi.objects.all(), sourse="ishlabchiqaruvchi"
     )
@@ -30,6 +36,7 @@ class AvtomobilSerializer(serializers.ModelSerializer):
             "yaratilgan_vaqti",
             "yoshi",
             "ishlab_chiqaruvchi_id",
+            "ishlab_chiqaruvchi",
         ]
 
         read_only_fields = [
@@ -125,7 +132,3 @@ class AvtomobilCreateSerializer(serializers.ModelSerializer):
         validated_data["modeli"] = str(validated_data["modeli"]).title()
         validated_data["markasi"] = str(validated_data["markasi"]).title()
         return super().create(validated_data)
-
-
-class IshlabChiqaruvchiSerializer(serializers.ModelSerializer):
-    pass
