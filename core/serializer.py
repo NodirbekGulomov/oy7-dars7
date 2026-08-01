@@ -6,8 +6,9 @@ from core.models import Avtomobil, IshlabChiqaruvchi
 
 
 class IshlabChiqaruvchiSerializer(serializers.ModelSerializer):
-    model = IshlabChiqaruvchi
-    fields = "__all__"
+    class Meta:
+        model = IshlabChiqaruvchi
+        fields = ["id", "nomi", "davlat", "email"]
 
 
 class AvtomobilSerializer(serializers.ModelSerializer):
@@ -132,3 +133,48 @@ class AvtomobilCreateSerializer(serializers.ModelSerializer):
         validated_data["modeli"] = str(validated_data["modeli"]).title()
         validated_data["markasi"] = str(validated_data["markasi"]).title()
         return super().create(validated_data)
+
+
+class AvtomobilDetailSerializer(serializers.ModelSerializer):
+    toliq_nomi = serializers.SerializerMethodField()
+    premium = serializers.SerializerMethodField()
+    eski_avtomobil = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Avtomobil
+        fields = [
+            "id",
+            "modeli",
+            "markasi",
+            "narxi",
+            "ishlab_chiqarilgan_yili",
+            "toliq_nomi",
+            "premium",
+            "eski_avtomobil",
+        ]
+
+    
+    def get_toliq_nomi(self, obj):
+        return f"{obj.markasi} {obj.modeli}"
+
+    
+    def get_premium(self, obj):
+        return obj.narxi >= 50000
+
+    def get_eski_avtomobil(self, obj):
+        joriy_yil = datetime.now().year
+        yoshi = joriy_yil - obj.ishlab_chiqarilgan_yili
+        return yoshi > 15
+
+
+def create(self, validated_data):
+    ishlab_chiqaruvchi_data = validated_data.pop("ishlab_chiqaruvchi")
+
+    email = ishlab_chiqaruvchi_data.get("email")
+    ishlab_chiqaruvchi, created = IshlabChiqaruvchi.objects.get_or_create(
+        email=email, defaults=ishlab_chiqaruvchi_data
+    )
+
+    avtomobil = Avtomobil.objects.create(ishlab_chiqaruvchi=ishlab_chiqaruvchi, **validated_data)
+
+    return avtomobil
