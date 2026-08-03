@@ -28,6 +28,9 @@ class Avtomobil(models.Model):
         blank=True,
         related_name="avtomobillar",
     )
+    kod = models.SlugField(unique=True)
+    yaratuvchi = models.CharField(max_length=50, default="")
+    oxirgi_tahrirlagan = models.CharField(max_length=50, default="")
 
     def __str__(self):
         return self.modeli
